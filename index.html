@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>あなたはどちらのタイプ？学級経営診断</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410;
+    --paper: #faf7f2;
+    --warm: #c8813a;
+    --warm-light: #f0d9bc;
+    --cool: #3a6b8a;
+    --cool-light: #c5dde8;
+    --mid: #6b7a5a;
+    --mid-light: #dde5cf;
+    --border: #d6cfc4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 4rem;
+  }
+  .container { width: 100%; max-width: 680px; }
+  .header {
+    text-align: center;
+    padding: 2.5rem 0 2rem;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 2.5rem;
+  }
+  .header-eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--warm);
+    margin-bottom: 0.75rem;
+  }
+  .header h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+  }
+  .header-sub { font-size: 0.8rem; color: #6b6257; }
+  .screen { display: none; animation: fadeIn 0.4s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+  .intro-body {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.9;
+    font-size: 0.9rem;
+  }
+  .intro-body p + p { margin-top: 1rem; }
+  .intro-body strong { color: var(--warm); }
+  .articles-preview {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .article-card {
+    border: 1px solid var(--border);
+    padding: 1.2rem;
+    background: white;
+  }
+  .article-card .label {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .article-card.a .label { color: var(--cool); }
+  .article-card.b .label { color: var(--warm); }
+  .article-card h3 { font-size: 0.82rem; line-height: 1.5; }
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn:hover { background: #3a2e28; }
+  .btn:disabled { background: #bbb; cursor: default; }
+  .btn.secondary {
+    background: white;
+    color: var(--ink);
+    border: 1px solid var(--border);
+    margin-top: 0.75rem;
+  }
+  .btn.secondary:hover { background: var(--paper); }
+  .progress-label {
+    font-size: 0.72rem;
+    color: #6b6257;
+    text-align: right;
+    margin-bottom: 0.4rem;
+  }
+  .progress-bar-wrap {
+    height: 3px;
+    background: var(--border);
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: var(--warm);
+    transition: width 0.4s ease;
+  }
+  .question-card {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  .question-poles {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+  }
+  .pole { font-size: 0.78rem; line-height: 1.5; width: 42%; }
+  .pole.a { color: var(--cool); text-align: left; }
+  .pole.b { color: var(--warm); text-align: right; }
+  .pole .pole-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: 0.3rem;
+    opacity: 0.7;
+  }
+  .scale-wrap { display: flex; flex-direction: column; gap: 0.5rem; }
+  .scale-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+  .scale-label-a { font-size: 0.65rem; color: var(--cool); width: 30px; text-align: center; }
+  .scale-label-b { font-size: 0.65rem; color: var(--warm); width: 30px; text-align: center; }
+  .scale-buttons { display: flex; gap: 0.5rem; }
+  .scale-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: white;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+  }
+  .scale-btn:hover { border-color: var(--warm); background: var(--warm-light); }
+  .scale-btn.sel-1 { background: var(--cool); border-color: var(--cool); color: white; }
+  .scale-btn.sel-2 { background: #7aabca; border-color: #7aabca; color: white; }
+  .scale-btn.sel-3 { background: var(--mid); border-color: var(--mid); color: white; }
+  .scale-btn.sel-4 { background: #c8974a; border-color: #c8974a; color: white; }
+  .scale-btn.sel-5 { background: var(--warm); border-color: var(--warm); color: white; }
+  .scale-hint {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.62rem;
+    color: #9a9085;
+    padding: 0 4px;
+    margin-top: 0.3rem;
+  }
+  .result-header {
+    text-align: center;
+    padding: 2.5rem 2rem;
+    margin-bottom: 1.5rem;
+  }
+  .result-header.type-a { background: var(--cool-light); border: 2px solid var(--cool); }
+  .result-header.type-mid { background: var(--mid-light); border: 2px solid var(--mid); }
+  .result-header.type-b { background: var(--warm-light); border: 2px solid var(--warm); }
+  .result-score { font-size: 0.75rem; letter-spacing: 0.1em; margin-bottom: 0.75rem; opacity: 0.7; }
+  .result-type-name {
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(1.3rem, 4vw, 1.8rem);
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+  }
+  .result-tagline { font-size: 0.82rem; line-height: 1.6; }
+  .radar-section {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .radar-section h3 {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: #6b6257;
+    margin-bottom: 1.2rem;
+    text-align: center;
+  }
+  .score-bars { display: flex; flex-direction: column; gap: 0.75rem; }
+  .score-bar-item { display: flex; align-items: center; gap: 0.75rem; }
+  .score-bar-label { font-size: 0.72rem; width: 120px; flex-shrink: 0; line-height: 1.3; }
+  .score-bar-track { flex: 1; height: 6px; background: var(--border); overflow: hidden; }
+  .score-bar-fill { height: 100%; transition: width 0.6s ease; }
+  .score-bar-val { font-size: 0.7rem; font-weight: 700; width: 16px; text-align: right; }
+  .advice-section { margin-bottom: 1.5rem; }
+  .advice-section h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .advice-card {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .advice-card .advice-tag {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+  .advice-card.do .advice-tag { color: var(--mid); }
+  .advice-card.watch .advice-tag { color: #a05a3a; }
+  .advice-card h4 { font-size: 0.88rem; font-weight: 700; margin-bottom: 0.4rem; line-height: 1.5; }
+  .advice-card p { font-size: 0.82rem; line-height: 1.7; color: #3a3028; }
+  .unique-insight {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .unique-insight .insight-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    opacity: 0.5;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+  .unique-insight p {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.92rem;
+    line-height: 1.9;
+  }
+  .unique-insight strong { color: #f0c878; }
+  @media (max-width: 480px) {
+    .articles-preview { grid-template-columns: 1fr; }
+    .scale-btn { width: 40px; height: 40px; font-size: 0.8rem; }
+    .score-bar-label { width: 95px; font-size: 0.68rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="header-eyebrow">自己診断</div>
+    <h1>あなたはどちらのタイプ？<br>学級経営スタイル診断</h1>
+    <div class="header-sub">8つの問いから、あなたの学級経営の軸を探ります</div>
+  </div>
+
+  <!-- SCREEN 1: INTRO -->
+
+  <div id="screen-intro" class="screen active">
+    <div class="intro-body">
+      <p>新年度、「<strong>やること」から始めるか。「やらないこと」から始めるか。</strong></p>
+      <p>二つの考え方を読み比べ、自分はどちらに近いのかを探ります。正解はありません。自分の軸を言語化するための診断です。</p>
+    </div>
+    <div class="articles-preview">
+      <div class="article-card a">
+        <div class="label">記事 A</div>
+        <h3>「やらないこと」を決めよ。余白が子どもを育てる。</h3>
+      </div>
+      <div class="article-card b">
+        <div class="label">記事 B</div>
+        <h3>まず「やること」を決めよ。準備が子どもを育てる。</h3>
+      </div>
+    </div>
+    <button class="btn" id="start-btn">診断をはじめる →</button>
+  </div>
+
+  <!-- SCREEN 2: QUIZ -->
+
+  <div id="screen-quiz" class="screen">
+    <div class="progress-label" id="progress-label">1 / 8</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progress-bar" style="width:12.5%"></div>
+    </div>
+    <div class="question-card" id="question-card">
+      <div class="question-poles">
+        <div class="pole a">
+          <span class="pole-label">A タイプ</span>
+          <span id="pole-a-text"></span>
+        </div>
+        <div class="pole b">
+          <span class="pole-label">B タイプ</span>
+          <span id="pole-b-text"></span>
+        </div>
+      </div>
+      <div class="scale-wrap">
+        <div class="scale-row">
+          <span class="scale-label-a">A</span>
+          <div class="scale-buttons" id="scale-buttons"></div>
+          <span class="scale-label-b">B</span>
+        </div>
+        <div class="scale-hint">
+          <span>Aに近い</span>
+          <span>どちらでもない</span>
+          <span>Bに近い</span>
+        </div>
+      </div>
+    </div>
+    <button class="btn" id="next-btn" disabled>次の問いへ →</button>
+    <button class="btn secondary" id="prev-btn" style="display:none">← 前に戻る</button>
+  </div>
+
+  <!-- SCREEN 3: RESULT -->
+
+  <div id="screen-result" class="screen">
+    <div id="result-header" class="result-header">
+      <div class="result-score" id="result-score"></div>
+      <div class="result-type-name" id="result-type-name"></div>
+      <div class="result-tagline" id="result-tagline"></div>
+    </div>
+    <div class="unique-insight">
+      <span class="insight-label">あなたへの一言</span>
+      <p id="insight-text"></p>
+    </div>
+    <div class="radar-section">
+      <h3>各項目のスコア</h3>
+      <div class="score-bars" id="score-bars"></div>
+    </div>
+    <div class="advice-section">
+      <h3>今年度、こんなことに注力して</h3>
+      <div id="do-cards"></div>
+    </div>
+    <div class="advice-section">
+      <h3>こんなことに気をつけて</h3>
+      <div id="watch-cards"></div>
+    </div>
+    <button class="btn secondary" id="restart-btn">もう一度やり直す</button>
+  </div>
+</div>
+
+<script>
+var questions = [
+  { label: "振り返り vs 準備", a: "今年度の振り返りを大事にする", b: "来年度の準備を大事にする" },
+  { label: "ルール決め", a: "学級のルールは子どもと決める", b: "学級のルールは教師が骨格を作る" },
+  { label: "育ちの場", a: "余白があった方が子どもは育つ", b: "準備が整った場で子どもは育つ" },
+  { label: "黄金の三日間", a: "黄金の三日間は意識しすぎない", b: "黄金の三日間は勝負どころ" },
+  { label: "教師の立ち位置", a: "教師は後ろから支える存在", b: "教師は前に立って整える存在" },
+  { label: "委ねる vs 設計", a: "子どもに委ねることが大切", b: "教師が設計図を持つことが大切" },
+  { label: "困ったときは", a: "うまくいかなくても一緒に考える", b: "うまくいくように事前に手を打つ" },
+  { label: "手法への姿勢", a: "新しい手法より自分の実践を磨く", b: "新しい手法を積極的に取り入れる" }
+];
+
+var answers = [null,null,null,null,null,null,null,null];
+var currentQ = 0;
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('start-btn').addEventListener('click', startQuiz);
+  document.getElementById('next-btn').addEventListener('click', nextQuestion);
+  document.getElementById('prev-btn').addEventListener('click', prevQuestion);
+  document.getElementById('restart-btn').addEventListener('click', restart);
+
+  document.getElementById('scale-buttons').addEventListener('click', function(e) {
+    var btn = e.target.closest('.scale-btn');
+    if (!btn) return;
+    var val = parseInt(btn.getAttribute('data-val'));
+    selectAnswer(val);
+  });
+});
+
+function showScreen(id) {
+  var screens = document.querySelectorAll('.screen');
+  for (var i = 0; i < screens.length; i++) {
+    screens[i].classList.remove('active');
+  }
+  document.getElementById(id).classList.add('active');
+}
+
+function startQuiz() {
+  showScreen('screen-quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  var q = questions[currentQ];
+  var selected = answers[currentQ];
+
+  document.getElementById('progress-label').textContent = (currentQ + 1) + ' / 8';
+  document.getElementById('progress-bar').style.width = (((currentQ + 1) / 8) * 100) + '%';
+  document.getElementById('prev-btn').style.display = currentQ === 0 ? 'none' : 'block';
+  document.getElementById('next-btn').disabled = (selected === null);
+  document.getElementById('next-btn').textContent = currentQ === 7 ? '結果を見る →' : '次の問いへ →';
+  document.getElementById('pole-a-text').textContent = q.a;
+  document.getElementById('pole-b-text').textContent = q.b;
+
+  var container = document.getElementById('scale-buttons');
+  container.innerHTML = '';
+  for (var v = 1; v <= 5; v++) {
+    var btn = document.createElement('button');
+    btn.className = 'scale-btn' + (selected === v ? ' sel-' + v : '');
+    btn.setAttribute('data-val', v);
+    btn.textContent = v;
+    container.appendChild(btn);
+  }
+}
+
+function selectAnswer(val) {
+  answers[currentQ] = val;
+
+  var btns = document.querySelectorAll('.scale-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].className = 'scale-btn';
+    if (parseInt(btns[i].getAttribute('data-val')) === val) {
+      btns[i].classList.add('sel-' + val);
+    }
+  }
+
+  if (currentQ === 7) {
+    document.getElementById('next-btn').textContent = '集計中…';
+    document.getElementById('next-btn').disabled = true;
+    setTimeout(showResult, 400);
+  } else {
+    document.getElementById('next-btn').disabled = false;
+  }
+}
+
+function nextQuestion() {
+  if (currentQ < 7) {
+    currentQ++;
+    renderQuestion();
+    window.scrollTo(0, 0);
+  } else {
+    showResult();
+  }
+}
+
+function prevQuestion() {
+  if (currentQ > 0) {
+    currentQ--;
+    renderQuestion();
+    window.scrollTo(0, 0);
+  }
+}
+
+function restart() {
+  answers = [null,null,null,null,null,null,null,null];
+  currentQ = 0;
+  showScreen('screen-intro');
+  window.scrollTo(0, 0);
+}
+
+function showResult() {
+  var total = 0;
+  for (var i = 0; i < answers.length; i++) {
+    total += answers[i];
+  }
+
+  var typeKey, typeName, tagline, headerClass;
+  if (total <= 18) {
+    typeKey = 'A';
+    typeName = '🔵 Aタイプ（余白・振り返り派）';
+    tagline = '子どもを信じ、振り返りを大切にするあなたへ';
+    headerClass = 'type-a';
+  } else if (total <= 29) {
+    typeKey = 'MID';
+    typeName = '🟡 ミドルタイプ';
+    tagline = '両方の視点を持つバランス型のあなたへ';
+    headerClass = 'type-mid';
+  } else {
+    typeKey = 'B';
+    typeName = '🔴 Bタイプ（準備・設計派）';
+    tagline = '準備を重ね、設計図を持って教室に立つあなたへ';
+    headerClass = 'type-b';
+  }
+
+  document.getElementById('result-score').textContent = '合計スコア ' + total + ' / 40';
+  document.getElementById('result-type-name').textContent = typeName;
+  document.getElementById('result-tagline').textContent = tagline;
+  document.getElementById('result-header').className = 'result-header ' + headerClass;
+  document.getElementById('insight-text').innerHTML = buildInsight(answers, total);
+
+  var barLabels = ['振り返り←→準備','ルール決め','育ちの場','黄金の三日間','立ち位置','委ねる←→設計','困ったとき','手法への姿勢'];
+  var barsHtml = '';
+  for (var j = 0; j < answers.length; j++) {
+    var v = answers[j];
+    var pct = ((v - 1) / 4) * 100;
+    var fillColor = v <= 2 ? '#3a6b8a' : v === 3 ? '#6b7a5a' : '#c8813a';
+    barsHtml += '<div class="score-bar-item">'
+      + '<div class="score-bar-label">' + barLabels[j] + '</div>'
+      + '<div class="score-bar-track"><div class="score-bar-fill" style="width:' + pct + '%;background:' + fillColor + '"></div></div>'
+      + '<div class="score-bar-val" style="color:' + fillColor + '">' + v + '</div>'
+      + '</div>';
+  }
+  document.getElementById('score-bars').innerHTML = barsHtml;
+
+  var advice = buildAdvice(answers, typeKey);
+  document.getElementById('do-cards').innerHTML = advice.doCards;
+  document.getElementById('watch-cards').innerHTML = advice.watchCards;
+
+  showScreen('screen-result');
+  window.scrollTo(0, 0);
+}
+
+function buildInsight(ans, total) {
+  var strongA = 0, strongB = 0;
+  for (var i = 0; i < ans.length; i++) {
+    if (ans[i] <= 2) strongA++;
+    if (ans[i] >= 4) strongB++;
+  }
+  var maxVal = Math.max.apply(null, ans);
+  var minVal = Math.min.apply(null, ans);
+  var spread = maxVal - minVal;
+
+  if (spread >= 3 && strongA >= 2 && strongB >= 2) {
+    return 'スコアにはっきりした<strong>ムラ</strong>があります。「ここは絶対A」「ここはB」という強い軸が複数あるタイプ。一言で言えば、<strong>「骨格は自分が作り、肉付けは子どもと一緒に」型</strong>です。バランス型というよりは、独自の哲学を持った実践者です。';
+  }
+  if (strongA >= 6) {
+    return 'ほぼ全項目でAに近い回答をしています。子どもへの<strong>深い信頼感</strong>が伝わります。ただ「余白」と「準備不足」は紙一重。今年は「ここだけは自分が用意する」という一点を意識すると、さらに安定します。';
+  }
+  if (strongB >= 6) {
+    return 'ほぼ全項目でBに近い回答をしています。緻密な準備力と設計力が強みです。ただ4月末に<strong>燃え尽きやすい</strong>タイプでもあります。準備の中に「子どもが予想外に動く余白」を一か所だけ意図的に残してみてください。';
+  }
+  if (total <= 18) return '振り返りを大切にし、子どもとともに学級を育てる姿勢が一貫しています。<strong>「問い続ける教師」</strong>の典型です。';
+  if (total >= 30) return '準備と設計を大切にし、子どもが安心して動ける場を整える姿勢が一貫しています。<strong>「環境を作る教師」</strong>の典型です。';
+  return '準備派の視点と余白派の視点、両方を状況に応じて使い分けられるタイプです。<strong>「自分の軸を一言で言語化」</strong>してみると、さらに強みが増します。';
+}
+
+function buildAdvice(ans, typeKey) {
+  var doArr = [];
+  var watchArr = [];
+
+  if (ans[2] <= 2) {
+    doArr.push({ title:'「余白」を意図的に設計してみる', body:'余白が育ちにつながると感じているあなたへ。「何もしない空白」ではなく、「この場面で子どもが考える」と意図した余白を作ると、より手応えが生まれます。' });
+  } else if (ans[2] >= 4) {
+    doArr.push({ title:'「完成しない」ことを一か所だけ残す', body:'準備が整った場を大切にするあなたへ。学期末に「まだ作り途中のルール」を一つ残しておくと、子どもが自分事として動き出すきっかけになります。' });
+  }
+  if (ans[5] <= 2) {
+    doArr.push({ title:'委ねる前に「ここだけは」を言語化する', body:'子どもに委ねる場面で、「何を任せて、何は自分が持つか」を事前に一言書き出す習慣を持つと、委ねた後の迷いが減ります。' });
+  } else if (ans[5] >= 4) {
+    doArr.push({ title:'設計図を「渡す」より「一緒に描く」場面を一つ作る', body:'設計力があるあなただからこそ、その設計を子どもに開示し、「どう思う？」と問う場面が生まれると、子どもの主体性が引き出されます。' });
+  }
+  if (ans[6] <= 2) {
+    doArr.push({ title:'振り返りに「次への仮説」を一つ加える', body:'一緒に考える姿勢は子どもに安心を与えます。そこに「次はこうしてみよう」という仮説を一言添えると、対話が前向きな実践につながります。' });
+  } else if (ans[6] >= 4) {
+    doArr.push({ title:'子どもの予想外の動きを「発見」として記録する', body:'事前に手を打つ準備力は強みです。それでも予想外は起きます。その瞬間をメモしておくと、次の設計がより精度の高いものになります。' });
+  }
+  if (ans[0] <= 2) {
+    doArr.push({ title:'年度末に小さく実験してみる', body:'振り返りを大切にするあなたへ。「来年試してみたいこと」を今年度のうちに一つだけ小さく試しておくと、新年度の実践がぐっと安定します。' });
+  }
+  if (doArr.length === 0) {
+    doArr.push({ title:'自分の「軸」を一言で言語化してみる', body:'迷ったとき「子どもにとってどうなの？」を羅針盤にする習慣が、両方の視点を活かす力になります。' });
+  }
+
+  if (ans[2] <= 2 && ans[1] <= 2) {
+    watchArr.push({ title:'「子どもに任せた」が「何もしなかった」になっていないか', body:'余白を大切にし、ルールも子どもと決めるスタイルは理想的ですが、教師の意図なき空白は子どもの混乱につながることも。' });
+  }
+  if (ans[3] <= 2) {
+    watchArr.push({ title:'4月最初の3日間、観察に集中できているか', body:'黄金の三日間を意識しすぎないスタイルは余裕を生みます。その余裕を「子どもをよく見る」時間に意図的に使えると、後の学級づくりに活きます。' });
+  }
+  if (ans[5] >= 4 && ans[3] >= 4) {
+    watchArr.push({ title:'4月末に燃え尽きていないか', body:'準備と設計を大切にするあなたは4月に全力を出しがちです。5月以降に余力を残す設計も、学年全体を見通した大事な準備です。' });
+  }
+  if (ans[1] >= 4 && ans[6] >= 4) {
+    watchArr.push({ title:'設計通りに進めることが目的になっていないか', body:'骨格を作り、事前に手を打つ力は大きな強みです。ただ、設計通りに進まない場面こそ子どもが育つ瞬間かもしれません。' });
+  }
+  if (watchArr.length === 0) {
+    watchArr.push({ title:'「バランスが取れている」と思い込んで止まっていないか', body:'どちらの視点も持っているからこそ、迷ったとき「子どもにとってどうなの？」という問いを羅針盤にしてみてください。' });
+  }
+
+  var doHtml = '';
+  for (var i = 0; i < Math.min(doArr.length, 3); i++) {
+    doHtml += '<div class="advice-card do"><span class="advice-tag">✅ 注力ポイント</span><h4>' + doArr[i].title + '</h4><p>' + doArr[i].body + '</p></div>';
+  }
+  var watchHtml = '';
+  for (var j = 0; j < Math.min(watchArr.length, 3); j++) {
+    watchHtml += '<div class="advice-card watch"><span class="advice-tag">⚠ 気をつけて</span><h4>' + watchArr[j].title + '</h4><p>' + watchArr[j].body + '</p></div>';
+  }
+
+  return { doCards: doHtml, watchCards: watchHtml };
+}
+</script>
+
+</body>
+</html>
